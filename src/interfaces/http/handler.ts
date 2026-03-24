@@ -1,38 +1,24 @@
 /**
- * Lambda HTTP handler (single entry point)
- * Role: translate API Gateway events into calls to application use-cases.
- * - No business logic here; the handler must only perform validation/parsing
- *   of the transport (HTTP) and delegate to application/use-cases.
+ * Lambda HTTP handler (TypeScript)
+ * - Thin transport adapter: translates API Gateway events into application
+ *   use-case calls. No business logic here.
  */
-/**
- * Lambda HTTP handler (single entry point)
- * Role: translate API Gateway events into calls to application use-cases.
- * This file is intentionally thin: no business logic lives here — only
- * parsing/validation of transport concerns and delegation to use-cases.
- */
-const createItem = require('../../src/application/use-cases/items/createItem').default;
-const getItem = require('../../src/application/use-cases/items/getItem').default;
-const updateItem = require('../../src/application/use-cases/items/updateItem').default;
-const deleteItem = require('../../src/application/use-cases/items/deleteItem').default;
-const createItemRepository = require('../../adapters/postgres/itemRepository');
+import createItem from '../../application/use-cases/items/createItem';
+import getItem from '../../application/use-cases/items/getItem';
+import updateItem from '../../application/use-cases/items/updateItem';
+import deleteItem from '../../application/use-cases/items/deleteItem';
+import createItemRepository from '../../adapters/postgres/itemRepository';
 
-// User use-cases (TypeScript sources). These are part of the application
-// layer and accept a repository via dependency injection. In a full build
-// pipeline the TS files are transpiled to JS before deployment.
-const createUser = require('../../src/application/use-cases/users/createUser').default;
-const getUser = require('../../src/application/use-cases/users/getUser').default;
-const updateUser = require('../../src/application/use-cases/users/updateUser').default;
-const deleteUser = require('../../src/application/use-cases/users/deleteUser').default;
-const createUserRepository = require('../../adapters/postgres/userRepository');
+import createUser from '../../application/use-cases/users/createUser';
+import getUser from '../../application/use-cases/users/getUser';
+import updateUser from '../../application/use-cases/users/updateUser';
+import deleteUser from '../../application/use-cases/users/deleteUser';
+import createUserRepository from '../../adapters/postgres/userRepository';
 
-// Instantiate repository once per cold start. This is dependency injection
-// at the module level for simplicity in a small project; in larger apps
-// consider a DI container or explicit wiring function for testing.
 const repository = createItemRepository();
 
-function jsonResponse(statusCode, body) {
+function jsonResponse(statusCode: number, body: any) {
   const headers = { 'Content-Type': 'application/json' };
-  // For 204 No Content return an empty body string (API Gateway expects string)
   return {
     statusCode,
     headers,
@@ -40,23 +26,23 @@ function jsonResponse(statusCode, body) {
   };
 }
 
-function parseBody(event) {
+function parseBody(event: any) {
   if (!event || !event.body) return {};
   try {
     return JSON.parse(event.body);
-  } catch (err) {
-    const e = new Error('Invalid JSON body');
+  } catch (err: any) {
+    const e: any = new Error('Invalid JSON body');
     e.type = 'VALIDATION';
     throw e;
   }
 }
 
-function getPathId(event) {
+function getPathId(event: any) {
   const pathParams = event.pathParameters || {};
   return pathParams.id;
 }
 
-module.exports.handler = async function handler(event) {
+export const handler = async function handler(event: any) {
   try {
     const method = event.httpMethod;
     const id = getPathId(event);
@@ -106,7 +92,7 @@ module.exports.handler = async function handler(event) {
     }
 
     return jsonResponse(404, { message: 'Not Found' });
-  } catch (err) {
+  } catch (err: any) {
     if (err && err.type === 'VALIDATION') return jsonResponse(400, { message: err.message });
     if (err && err.type === 'NOT_FOUND') return jsonResponse(404, { message: err.message });
     if (err && err.type === 'DB') return jsonResponse(502, { message: 'Database error' });
