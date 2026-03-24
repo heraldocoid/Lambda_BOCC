@@ -23,3 +23,9 @@ export class UserEntity implements User {
     this.createdAt = createdAt;
   }
 }
+
+/**
+ * Note: domain types are intentionally minimal — all validation lives in
+ * the application/use-cases layer. This keeps the domain pure and focused
+ * on the business concepts, not on transport or persistence concerns.
+ */

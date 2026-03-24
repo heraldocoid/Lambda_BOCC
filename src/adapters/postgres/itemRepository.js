@@ -1,7 +1,11 @@
 /**
  * Postgres adapter: item repository
- * - Implements the repository port used by application use-cases
- * - Keeps SQL parameterized and returns plain JS objects
+ * Adapter responsibilities:
+ * - Encapsulate SQL and parameterization
+ * - Map DB rows to plain objects used by the application layer
+ * - Surface DB errors as typed errors (err.type = 'DB')
+ *
+ * This adapter sits in the "adapters" folder as part of the outer hexagon.
  */
 const pg = require('./postgresClient');
 

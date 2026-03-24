@@ -1,6 +1,12 @@
 const { Pool } = require('pg');
 
-// Reuse global pool across Lambda warm starts to avoid exhausting connections.
+/**
+ * Adapter: Postgres client
+ * - Reuses a single `Pool` across warm Lambda starts to avoid exhausting
+ *   database connections.
+ * - Wraps `pool.query` and rethrows errors with a typed `err.type = 'DB'` so
+ *   application layers can map and handle DB failures uniformly.
+ */
 let pool = global.__pgPool;
 if (!pool) {
   pool = new Pool({
