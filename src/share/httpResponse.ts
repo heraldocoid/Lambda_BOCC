@@ -1,14 +1,12 @@
 /**
  * @Author: Kevin S. Rodriguez Castillo
-* this class is responsible for the response HTTP generic of the JSON functions
-*/
+ * this class is responsible for the response HTTP generic of the JSON functions
+ */
 
-function json(statusCode, body) {
+export function json(statusCode: number, body: any) {
   return {
     statusCode,
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body)
   };
 }
- 
-module.exports = { json };
