@@ -1,6 +1,10 @@
 /**
- * @Author: Kevin S. Rodriguez Castillo
- * this class is responsible for the response HTTP generic of the JSON functions
+ * 
+ * Clase de utilería para respuestas HTTP
+ * 
+ * @description: Core utility for generic HTTP JSON responses
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
  */
 
 export function json(statusCode: number, body: any) {

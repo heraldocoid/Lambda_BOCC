@@ -2,9 +2,12 @@ import { Pool } from 'pg';
 import { SecretConfigService } from '../services/SecretConfigService';
 
 /**
- * @Author: Leonardo S Ruiz Rodriguez
- * Client for connection with PostgreSQL
- * This class is reused between Lambda executions
+ * 
+ * Configuración de pool de conexiones para PostgreSQL
+ * 
+ * @description: Database connection pool configuration
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
  */
 
 let poolInstance: Pool | null = null;

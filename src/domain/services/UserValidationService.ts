@@ -1,5 +1,14 @@
 import { User } from '../entities/User';
 
+/**
+ * 
+ * Clase de servicio de validación de usuarios
+ * 
+ * @description: Core domain logic for validating User data
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
+
 export class UserValidationService {
   static validate(user: Partial<User>): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];

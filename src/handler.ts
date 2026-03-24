@@ -4,6 +4,15 @@ import { UserService } from './application/use-cases/UserService';
 import { PgUserRepository } from './infraestructure/repositories/PgUserRepository';
 import { SecretConfigService } from './infraestructure/services/SecretConfigService';
 
+/**
+ * 
+ * Handler principal de la función Lambda
+ * 
+ * @description: Entry point for the AWS Lambda function handling User CRUD
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
+
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   let method = event.httpMethod;
 
@@ -12,7 +21,9 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
     await SecretConfigService.getInstance().initialize();
 
     const userService = new UserService(new PgUserRepository());
+
     switch (method) {
+
       case 'GET': {
         const results = await userService.getAllUsers();
         return json(200, results);

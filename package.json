@@ -4,6 +4,7 @@
   "scripts": {
     "build": "npm run build --prefix src",
     "start": "npm run start --prefix src",
-    "package": "npm run package --prefix src"
+    "package": "npm run package --prefix src",
+    "test": "npm run test --prefix src"
   }
 }

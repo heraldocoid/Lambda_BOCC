@@ -1,6 +1,14 @@
 import { ParameterStoreService } from './ParameterStoreService';
 import { SecretManagerService } from './SecretManagerService';
 
+/**
+ * 
+ * Clase de configuración de secretos y parametros de AWS
+ * 
+ * @description: Service to fetch secrets from AWS Parameter Store and Secrets Manager
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
 export class SecretConfigService {
   private static instance: SecretConfigService;
   private config: Record<string, string> = {};

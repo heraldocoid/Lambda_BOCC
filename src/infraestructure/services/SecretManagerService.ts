@@ -1,5 +1,13 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
+/**
+ * 
+ * Clase de consumo de los secretos de AWS
+ * 
+ * @description: Service to fetch secrets from AWS Parameter Store and Secrets Manager
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
 export class SecretManagerService {
   private readonly client: SecretsManagerClient;
 
@@ -18,7 +26,7 @@ export class SecretManagerService {
       });
 
       const response = await this.client.send(command);
-      
+
       if (response.SecretString) {
         try {
           return JSON.parse(response.SecretString) as T;

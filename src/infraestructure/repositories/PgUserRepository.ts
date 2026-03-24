@@ -2,6 +2,15 @@ import pool from '../db/pool';
 import { User } from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 
+/**
+ * 
+ * Clase de repositorio PostgreSQL para usuarios
+ * 
+ * @description: PostgreSQL implementation for the User Repository
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
+
 export class PgUserRepository implements UserRepository {
   async findAll(): Promise<User[]> {
     const result = await pool().query('SELECT * FROM users');

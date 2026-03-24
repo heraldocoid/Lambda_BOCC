@@ -3,6 +3,15 @@ import { User } from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { UserValidationService } from '../../domain/services/UserValidationService';
 
+/**
+ * 
+ * Clase de servicio para la gestión de usuarios
+ * 
+ * @description: Application service layer for User management
+ * @author: Carlos A. Escobar Navarro
+ * @created: 2026-03-24
+ */
+
 export class UserService {
   constructor(private readonly userRepository: UserRepository) { }
 
