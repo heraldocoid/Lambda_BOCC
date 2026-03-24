@@ -1,0 +1,9 @@
+{
+  "name": "lambda-bocc",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm run build --prefix src",
+    "start": "npm run start --prefix src",
+    "package": "npm run package --prefix src"
+  }
+}

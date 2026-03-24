@@ -5,6 +5,8 @@
   "main": "dist/handler.js",
   "scripts": {
     "build": "tsc",
+    "start": "ts-node run.ts",
+    "package": "ts-node package-lambda.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,12 +14,17 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1015.0",
+    "@aws-sdk/client-ssm": "^3.1015.0",
     "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@types/archiver": "^7.0.0",
     "@types/aws-lambda": "^8.10.161",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
+    "archiver": "^7.0.1",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
   }
 }

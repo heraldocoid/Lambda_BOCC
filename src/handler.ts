@@ -32,10 +32,10 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
 
       default:
         // Método no soportado
-        return json(405, { error: `Método ${method} no permitido` });
+        return json(405, { error: `Method ${method} not allowed` });
     }
   } catch (error) {
     console.error("Error no controlado: ", error);
-    return json(500, { error: "Error interno del servidor" });
+    return json(500, { error: "Internal server error" });
   }
 };
