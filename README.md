@@ -43,5 +43,3 @@ Code organization
 - `src/adapters/postgres` — Postgres adapters (outer layer)
 - `src/interfaces/http` — Lambda handler (thin transport layer)
 
-If you want, I can add a GitHub Actions workflow to run tests and TypeScript
-checks on each PR.
