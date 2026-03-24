@@ -8,7 +8,7 @@ const createItem = require('../../application/use-cases/createItem');
 const getItem = require('../../application/use-cases/getItem');
 const updateItem = require('../../application/use-cases/updateItem');
 const deleteItem = require('../../application/use-cases/deleteItem');
-const createItemRepository = require('../../infrastructure/db/itemRepository');
+const createItemRepository = require('../../adapters/postgres/itemRepository');
 
 // Instantiate repository once per cold start. This is dependency injection
 // at the module level for simplicity in a small project; in larger apps

@@ -1,10 +1,7 @@
 /**
- * Infrastructure adapter: Postgres implementation of the Item repository port.
- * Responsibilities:
- * - Translate repository calls into parameterized SQL queries
- * - Map DB errors to a typed error (err.type = 'DB') so upper layers can react
- * NOTE: Business validation must remain in application use-cases; repository
- * trusts the use-case to supply valid data.
+ * Postgres adapter: item repository
+ * - Implements the repository port used by application use-cases
+ * - Keeps SQL parameterized and returns plain JS objects
  */
 const pg = require('./postgresClient');
 
