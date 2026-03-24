@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { SecretConfigService } from '../services/SecretConfigService';
 
 /**
  * @Author: Leonardo S Ruiz Rodriguez
@@ -6,12 +7,21 @@ import { Pool } from 'pg';
  * This class is reused between Lambda executions
  */
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: 5432,
-});
+let poolInstance: Pool | null = null;
 
-export default pool;
+const getPool = (): Pool => {
+  if (!poolInstance) {
+    const config = SecretConfigService.getInstance().getAll();
+
+    poolInstance = new Pool({
+      host: config.DB_HOST,
+      user: config.DB_USER,
+      password: config.DB_PASS,
+      database: config.DB_NAME,
+      port: 5432,
+    });
+  }
+  return poolInstance;
+};
+
+export default getPool;

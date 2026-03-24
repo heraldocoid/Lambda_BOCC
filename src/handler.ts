@@ -2,11 +2,14 @@ import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda
 import { json } from './share/httpResponse';
 import { UserService } from './application/use-cases/UserService';
 import { PgUserRepository } from './infraestructure/repositories/PgUserRepository';
+import { SecretConfigService } from './infraestructure/services/SecretConfigService';
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   let method = event.httpMethod;
 
   try {
+    // Inicializar configuración de secretos
+    await SecretConfigService.getInstance().initialize();
 
     const userService = new UserService(new PgUserRepository());
     switch (method) {
