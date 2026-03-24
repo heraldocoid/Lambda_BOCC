@@ -1,23 +1,41 @@
 /**
- * Infrastructure repository: itemRepository
- * Encapsulates all SQL and Postgres specifics; returns plain objects.
+ * Infrastructure adapter: Postgres implementation of the Item repository port.
+ * Responsibilities:
+ * - Translate repository calls into parameterized SQL queries
+ * - Map DB errors to a typed error (err.type = 'DB') so upper layers can react
+ * NOTE: Business validation must remain in application use-cases; repository
+ * trusts the use-case to supply valid data.
  */
 const pg = require('./postgresClient');
 
-async function create(item) {
+async function createItem(item) {
   const text = `INSERT INTO items (name, description, status, created_at)
     VALUES ($1, $2, $3, NOW()) RETURNING id, name, description, status, created_at`;
   const values = [item.name, item.description, item.status];
-  const res = await pg.query(text, values);
-  return res.rows[0];
+  try {
+    const res = await pg.query(text, values);
+    return res.rows[0];
+  } catch (err) {
+    const e = new Error('Error creating item');
+    e.type = 'DB';
+    e.original = err;
+    throw e;
+  }
 }
 
 async function findById(id) {
-  const res = await pg.query('SELECT id, name, description, status, created_at FROM items WHERE id = $1', [id]);
-  return res.rows[0] || null;
+  try {
+    const res = await pg.query('SELECT id, name, description, status, created_at FROM items WHERE id = $1', [id]);
+    return res.rows[0] || null;
+  } catch (err) {
+    const e = new Error('Error finding item by id');
+    e.type = 'DB';
+    e.original = err;
+    throw e;
+  }
 }
 
-async function update(id, fields) {
+async function updateItem(id, fields) {
   const sets = [];
   const values = [];
   let idx = 1;
@@ -31,20 +49,34 @@ async function update(id, fields) {
 
   values.push(id);
   const text = `UPDATE items SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING id, name, description, status, created_at`;
-  const res = await pg.query(text, values);
-  return res.rows[0] || null;
+  try {
+    const res = await pg.query(text, values);
+    return res.rows[0] || null;
+  } catch (err) {
+    const e = new Error('Error updating item');
+    e.type = 'DB';
+    e.original = err;
+    throw e;
+  }
 }
 
-async function remove(id) {
-  const res = await pg.query('DELETE FROM items WHERE id = $1', [id]);
-  return res.rowCount > 0;
+async function deleteItem(id) {
+  try {
+    const res = await pg.query('DELETE FROM items WHERE id = $1', [id]);
+    return res.rowCount > 0;
+  } catch (err) {
+    const e = new Error('Error deleting item');
+    e.type = 'DB';
+    e.original = err;
+    throw e;
+  }
 }
 
 module.exports = function createItemRepository() {
   return {
-    create,
+    create: createItem,
     findById,
-    update,
-    delete: remove,
+    update: updateItem,
+    delete: deleteItem,
   };
 };
