@@ -1,3 +1,6 @@
+/**
+ * Unit tests for `deleteUser` use-case. Repository is mocked to avoid DB.
+ */
 import deleteUser from '../../src/application/use-cases/users/deleteUser';
 
 describe('deleteUser use-case', () => {

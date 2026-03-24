@@ -1,3 +1,6 @@
+/**
+ * Unit tests for `updateUser` use-case. Focuses on behavior and validation.
+ */
 import updateUser from '../../src/application/use-cases/users/updateUser';
 
 describe('updateUser use-case', () => {

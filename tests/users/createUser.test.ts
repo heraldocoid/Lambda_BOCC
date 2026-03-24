@@ -1,3 +1,8 @@
+/**
+ * Unit tests for `createUser` use-case.
+ * - These tests mock the repository port to ensure the use-case logic
+ *   is validated in isolation from infrastructure.
+ */
 import createUser from '../../src/application/use-cases/users/createUser';
 
 describe('createUser use-case', () => {

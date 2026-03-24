@@ -1,8 +1,11 @@
 /**
  * Jest test for createItem use-case
  * - Mocks repository so no DB is required
+ * - This test verifies the behaviour of the `createItem` use-case (unit)
+ *   and intentionally mocks the repository (ports) to keep it fast and
+ *   deterministic. Tests should validate behaviour, not implementation.
  */
-const createItem = require('../src/application/use-cases/createItem');
+const createItem = require('../src/application/use-cases/items/createItem').default;
 
 describe('createItem use-case', () => {
   test('creates item when valid input provided', async () => {

@@ -10,10 +10,10 @@
  * This file is intentionally thin: no business logic lives here — only
  * parsing/validation of transport concerns and delegation to use-cases.
  */
-const createItem = require('../../application/use-cases/createItem');
-const getItem = require('../../application/use-cases/getItem');
-const updateItem = require('../../application/use-cases/updateItem');
-const deleteItem = require('../../application/use-cases/deleteItem');
+const createItem = require('../../src/application/use-cases/items/createItem').default;
+const getItem = require('../../src/application/use-cases/items/getItem').default;
+const updateItem = require('../../src/application/use-cases/items/updateItem').default;
+const deleteItem = require('../../src/application/use-cases/items/deleteItem').default;
 const createItemRepository = require('../../adapters/postgres/itemRepository');
 
 // User use-cases (TypeScript sources). These are part of the application

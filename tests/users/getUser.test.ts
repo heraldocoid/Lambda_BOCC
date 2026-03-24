@@ -1,3 +1,6 @@
+/**
+ * Unit tests for `getUser` use-case. Mocks repository port; validates behavior.
+ */
 import getUser from '../../src/application/use-cases/users/getUser';
 
 describe('getUser use-case', () => {
