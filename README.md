@@ -80,10 +80,8 @@ Step-by-step: subir y probar (para el equipo que recibe el ZIP)
 
 1. Subir el ZIP al Lambda (consola):
   - Runtime: `nodejs18.x`
-  - Code -> Upload from .zip file -> seleccionar `deployment.zip` (o `deployment-esbuild.zip`)
-  - Handler:
-    - `interfaces/http/handler.handler` (si usas `deployment.zip`)
-    - `index.handler` (si usas `deployment-esbuild.zip`)
+  - Code -> Upload from .zip file -> seleccionar `deployment.zip`
+  - Handler: `interfaces/http/handler.handler`
   - Environment variables: definir `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` (o `DATABASE_URL`).
   - Memory/Timeout: comenzar con `512 MB` y `30s`.
 
@@ -112,8 +110,8 @@ Step-by-step: subir y probar (para el equipo que recibe el ZIP)
 
 Optional improvements
 
-- Add an automated deployment step that provisions or updates the Lambda (SAM / CDK / Serverless framework).
-- Use RDS Proxy for better connection management.
+- Añadir un paso automatizado de provisioning/despliegue (SAM / CDK / Serverless) si se desea.
+- Usar RDS Proxy para mejor gestión de conexiones.
 
 See the `.env.example`, `.github/workflows/ci-deploy.yml` and `scripts/package.js` for concrete commands and examples.
 
