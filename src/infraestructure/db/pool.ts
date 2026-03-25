@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+import { Pool } from "pg";
 
 /**
  * @Author: Leonardo S Ruiz Rodriguez
@@ -14,4 +14,4 @@ const pool = new Pool({
   port: 5432,
 });
 
-module.exports = pool;
+export default pool;
