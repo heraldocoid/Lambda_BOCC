@@ -38,4 +38,20 @@ Despliegue: subir `deployment.zip` desde la consola de AWS
 
 Permisos IAM recomendados (mínimo): `lambda:CreateFunction`, `lambda:UpdateFunctionCode`, `iam:PassRole`.
 
+Variables de entorno y secretos
+- Variables de entorno esperadas por la función:
+	- `ARN_SECRET` — ARN del secreto en Secrets Manager (opcional si se usa Parameter Store).
+	- `ACO_DB_PORT` — puerto de la base de datos (ej. `5432`).
+	- `ENV_REGION` — región AWS donde corre la función (ej. `us-east-1`).
+
+- Parameter Store (SSM) — claves esperadas:
+	- `/ACO/BOCC/dbHost`
+	- `/ACO/BOCC/dbName`
+
+- Secrets Manager — secretos esperados (nombres):
+	- `acoDbUser`
+	- `acoDbPass`
+
+Coloca valores en Environment variables (Configuration → Environment variables) o usa SSM/Secrets Manager y pasa solo el ARN/identificadores en variables de entorno.
+
 
