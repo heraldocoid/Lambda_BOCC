@@ -15,7 +15,9 @@ import updateUser from '../../application/use-cases/users/updateUser';
 import deleteUser from '../../application/use-cases/users/deleteUser';
 import createUserRepository from '../../adapters/postgres/userRepository';
 
-const repository = createItemRepository();
+// Repositories (outer adapters)
+const itemRepository = createItemRepository();
+const userRepository = createUserRepository();
 
 function jsonResponse(statusCode: number, body: any) {
   const headers = { 'Content-Type': 'application/json' };
@@ -47,52 +49,78 @@ export const handler = async function handler(event: any) {
     const method = event.httpMethod;
     const id = getPathId(event);
 
-    // Item routes
-    if (method === 'POST' && !id) {
-      const payload = parseBody(event);
-      const created = await createItem(repository, payload);
-      return jsonResponse(201, created);
+    // Determine entity via query param: ?entity=users|items (default: items)
+    const query = event.queryStringParameters || {};
+    const entity = (query.entity || 'items').toString().toLowerCase();
+
+    // Helper: require id for GET/PUT/DELETE
+    const requireId = (m: string) => {
+      if (!id) {
+        const e: any = new Error('id is required');
+        e.type = 'VALIDATION';
+        throw e;
+      }
+    };
+
+    // ROUTING: only based on httpMethod, presence of id, and entity
+    if (entity === 'items') {
+      if (method === 'POST' && !id) {
+        const payload = parseBody(event);
+        const created = await createItem(itemRepository, payload);
+        return jsonResponse(201, created);
+      }
+
+      if (method === 'GET') {
+        requireId('GET');
+        const found = await getItem(itemRepository, id);
+        return jsonResponse(200, found);
+      }
+
+      if (method === 'PUT') {
+        requireId('PUT');
+        const payload = parseBody(event);
+        const updated = await updateItem(itemRepository, id, payload);
+        return jsonResponse(200, updated);
+      }
+
+      if (method === 'DELETE') {
+        requireId('DELETE');
+        await deleteItem(itemRepository, id);
+        return jsonResponse(204, null);
+      }
     }
 
-    if (method === 'GET' && id) {
-      const found = await getItem(repository, id);
-      return jsonResponse(200, found);
+    if (entity === 'users') {
+      if (method === 'POST' && !id) {
+        const payload = parseBody(event);
+        const created = await createUser(userRepository, payload);
+        return jsonResponse(201, created);
+      }
+
+      if (method === 'GET') {
+        requireId('GET');
+        const found = await getUser(userRepository, id);
+        return jsonResponse(200, found);
+      }
+
+      if (method === 'PUT') {
+        requireId('PUT');
+        const payload = parseBody(event);
+        const updated = await updateUser(userRepository, id, payload);
+        return jsonResponse(200, updated);
+      }
+
+      if (method === 'DELETE') {
+        requireId('DELETE');
+        await deleteUser(userRepository, id);
+        return jsonResponse(204, null);
+      }
     }
 
-    if (method === 'PUT' && id) {
-      const payload = parseBody(event);
-      const updated = await updateItem(repository, id, payload);
-      return jsonResponse(200, updated);
-    }
-
-    if (method === 'DELETE' && id) {
-      await deleteItem(repository, id);
-      return jsonResponse(204, null);
-    }
-
-    // User routes
-    const userRepo = createUserRepository();
-    if (method === 'POST' && !id && event.path && event.path.startsWith('/users')) {
-      const payload = parseBody(event);
-      const created = await createUser(userRepo, payload);
-      return jsonResponse(201, created);
-    }
-    if (method === 'GET' && id && event.path && event.path.startsWith('/users')) {
-      const found = await getUser(userRepo, id);
-      return jsonResponse(200, found);
-    }
-    if (method === 'PUT' && id && event.path && event.path.startsWith('/users')) {
-      const payload = parseBody(event);
-      const updated = await updateUser(userRepo, id, payload);
-      return jsonResponse(200, updated);
-    }
-    if (method === 'DELETE' && id && event.path && event.path.startsWith('/users')) {
-      await deleteUser(userRepo, id);
-      return jsonResponse(204, null);
-    }
-
+    // If no route matched, return Not Found
     return jsonResponse(404, { message: 'Not Found' });
   } catch (err: any) {
+    // Error mapping
     if (err && err.type === 'VALIDATION') return jsonResponse(400, { message: err.message });
     if (err && err.type === 'NOT_FOUND') return jsonResponse(404, { message: err.message });
     if (err && err.type === 'DB') return jsonResponse(502, { message: 'Database error' });
