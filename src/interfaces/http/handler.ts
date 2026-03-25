@@ -127,13 +127,31 @@ export const handler = async function handler(event: any) {
     // If no route matched, return Not Found
     return jsonResponse(404, { message: 'Not Found' });
   } catch (err: any) {
-    // Diagnostic error logging (avoid printing stacks or secrets)
-    console.error('[error]', {
-      requestId: event?.requestContext?.requestId,
-      type: err?.type,
-      message: err?.message,
-      originalMessage: err?.original?.message,
-    });
+    // If this is a DB error, emit a deeper diagnostic log (without secrets)
+    if (err && err.type === 'DB') {
+      const db = err?.original;
+      const root = err?.original?.original;
+      console.error('[db-error]', {
+        requestId: event?.requestContext?.requestId,
+        message: err?.message,
+        originalMessage: db?.message,
+        rootMessage: root?.message,
+        code: root?.code,
+        errno: root?.errno,
+        address: root?.address,
+        port: root?.port,
+        detail: root?.detail,
+        severity: root?.severity,
+      });
+    } else {
+      // Generic error log (avoid printing stacks or secrets)
+      console.error('[error]', {
+        requestId: event?.requestContext?.requestId,
+        type: err?.type,
+        message: err?.message,
+        originalMessage: err?.original?.message,
+      });
+    }
 
     // Error mapping
     if (err && err.type === 'VALIDATION') return jsonResponse(400, { message: err.message });
