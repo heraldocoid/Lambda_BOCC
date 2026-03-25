@@ -5,6 +5,12 @@ npm-debug.log
 # Build
 dist/
 coverage/
+# Artifacts
+artifact/
+deployment.zip
+deployment-esbuild.zip
+artifact_unpack/
+esbuild_unpack/
 # Env
 .env
 # VSCode
