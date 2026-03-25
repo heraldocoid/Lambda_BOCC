@@ -39,24 +39,31 @@ function parseBody(event: any) {
   }
 }
 
-function getPathId(event: any) {
-  const pathParams = event.pathParameters || {};
-  return pathParams.id;
-}
-
+// NOTE: routing intentionally uses ONLY query params to simplify API Gateway
 export const handler = async function handler(event: any) {
   try {
     const method = event.httpMethod;
-    const id = getPathId(event);
 
-    // Determine entity via query param: ?entity=users|items (default: items)
-    const query = event.queryStringParameters || {};
-    const entity = (query.entity || 'items').toString().toLowerCase();
+    // Read entity and id from query params only (no path or pathParameters)
+    const qs = event?.queryStringParameters || {};
+    const entity = String(qs.entity || 'items').toLowerCase(); // items | users
+    const id = qs.id;
+
+    // Diagnostic logging (do not print secrets or full body)
+    console.log('[request]', {
+      requestId: event?.requestContext?.requestId,
+      method: event?.httpMethod,
+      path: event?.path,
+      entity,
+      id,
+      hasBody: Boolean(event?.body),
+      bodyLength: event?.body ? String(event.body).length : 0,
+    });
 
     // Helper: require id for GET/PUT/DELETE
-    const requireId = (m: string) => {
+    const requireId = () => {
       if (!id) {
-        const e: any = new Error('id is required');
+        const e: any = new Error('`id` is required');
         e.type = 'VALIDATION';
         throw e;
       }
@@ -71,20 +78,20 @@ export const handler = async function handler(event: any) {
       }
 
       if (method === 'GET') {
-        requireId('GET');
+        requireId();
         const found = await getItem(itemRepository, id);
         return jsonResponse(200, found);
       }
 
       if (method === 'PUT') {
-        requireId('PUT');
+        requireId();
         const payload = parseBody(event);
         const updated = await updateItem(itemRepository, id, payload);
         return jsonResponse(200, updated);
       }
 
       if (method === 'DELETE') {
-        requireId('DELETE');
+        requireId();
         await deleteItem(itemRepository, id);
         return jsonResponse(204, null);
       }
@@ -98,20 +105,20 @@ export const handler = async function handler(event: any) {
       }
 
       if (method === 'GET') {
-        requireId('GET');
+        requireId();
         const found = await getUser(userRepository, id);
         return jsonResponse(200, found);
       }
 
       if (method === 'PUT') {
-        requireId('PUT');
+        requireId();
         const payload = parseBody(event);
         const updated = await updateUser(userRepository, id, payload);
         return jsonResponse(200, updated);
       }
 
       if (method === 'DELETE') {
-        requireId('DELETE');
+        requireId();
         await deleteUser(userRepository, id);
         return jsonResponse(204, null);
       }
@@ -120,11 +127,18 @@ export const handler = async function handler(event: any) {
     // If no route matched, return Not Found
     return jsonResponse(404, { message: 'Not Found' });
   } catch (err: any) {
+    // Diagnostic error logging (avoid printing stacks or secrets)
+    console.error('[error]', {
+      requestId: event?.requestContext?.requestId,
+      type: err?.type,
+      message: err?.message,
+      originalMessage: err?.original?.message,
+    });
+
     // Error mapping
     if (err && err.type === 'VALIDATION') return jsonResponse(400, { message: err.message });
     if (err && err.type === 'NOT_FOUND') return jsonResponse(404, { message: err.message });
     if (err && err.type === 'DB') return jsonResponse(502, { message: 'Database error' });
-    console.error(err);
     return jsonResponse(500, { message: 'Internal Server Error' });
   }
 };
