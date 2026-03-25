@@ -36,10 +36,11 @@ async function zipDirectory(sourceDir, outPath) {
 
 (async function main() {
   try {
-    // 1) Build
-    run('npm run build');
-
     const root = path.resolve(__dirname, '..');
+    // ensure process cwd is repo root (helps when previous steps changed terminal cwd)
+    try { process.chdir(root); } catch (e) {}
+    // 1) Build
+    run('npm run build', { cwd: root });
     const dist = path.join(root, 'dist');
     const artifact = path.join(root, 'artifact');
 
@@ -50,24 +51,33 @@ async function zipDirectory(sourceDir, outPath) {
     // 3) Copy dist -> artifact
     copyDir(dist, artifact);
 
-    // 4) Copy package.json and package-lock.json (if exists)
+    // 4) Prepare minimal package.json (only production deps) so npm install is deterministic
     const pkg = path.join(root, 'package.json');
     const pkgLock = path.join(root, 'package-lock.json');
-    fs.copyFileSync(pkg, path.join(artifact, 'package.json'));
+    const pkgData = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+    const minimalPkg = {
+      name: pkgData.name || 'artifact',
+      version: pkgData.version || '1.0.0',
+      private: pkgData.private === true,
+      type: pkgData.type || 'commonjs',
+      dependencies: pkgData.dependencies || {},
+    };
+    fs.writeFileSync(path.join(artifact, 'package.json'), JSON.stringify(minimalPkg, null, 2));
     if (fs.existsSync(pkgLock)) {
       fs.copyFileSync(pkgLock, path.join(artifact, 'package-lock.json'));
     }
 
     // 5) Install production deps inside artifact
     console.log('Installing production dependencies inside artifact...');
-    let npmRes;
-    if (fs.existsSync(pkgLock)) {
-      npmRes = spawnSync('npm', ['ci', '--omit=dev'], { cwd: artifact, stdio: 'inherit' });
-    } else {
-      npmRes = spawnSync('npm', ['install', '--omit=dev', '--no-audit', '--no-fund'], { cwd: artifact, stdio: 'inherit' });
-    }
-    if (npmRes.status !== 0) {
-      throw new Error('npm install for production deps failed');
+    try {
+      if (fs.existsSync(pkgLock)) {
+        execSync('npm ci --omit=dev', { cwd: artifact, stdio: 'inherit' });
+      } else {
+        execSync('npm install --omit=dev --no-audit --no-fund', { cwd: artifact, stdio: 'inherit' });
+      }
+    } catch (err) {
+      console.error('npm install failed', err);
+      throw err;
     }
 
     // 6) Create zip
