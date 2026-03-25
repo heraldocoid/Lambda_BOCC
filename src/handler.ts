@@ -1,7 +1,7 @@
-import { pool } from '../../infraestructure/db/pool.ts';
+import { pool } from './infraestructure/db/pool.ts';
 import { json } from './share/httpResponse.js';
-import { createUser } from "../../application/use-cases/UserService.ts";
-import { pgUserRepository } from "../../infraestructure/repositories/pgUserRepository";
+import { createUser } from "./application/use-cases/UserService.ts";
+import { pgUserRepository } from "./infraestructure/repositories/pgUserRepository";
 
 
 const repo = new pgUserRepository(pool);
