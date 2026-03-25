@@ -47,5 +47,4 @@ Notas
 - El comando de `update-function-code` requiere que la función ya exista.
 - Alternativa: subir `deployment.zip` desde la consola de Lambda o a S3 y usarlo como origen del código.
 
-Fin.
 
