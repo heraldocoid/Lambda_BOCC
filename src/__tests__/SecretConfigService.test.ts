@@ -37,8 +37,8 @@ describe('SecretConfigService', () => {
   it('should initialize config properly when AWS returns values', async () => {
     ssmMock.getParameter.mockResolvedValueOnce('db-name').mockResolvedValueOnce('db-host');
     secretsMock.getSecret.mockResolvedValueOnce({
-      DB_USER: 'user',
-      DB_PASS: 'pass',
+      acoDbUser: 'user',
+      acoDbPass: 'pass',
     });
 
     const instance = SecretConfigService.getInstance();
@@ -51,14 +51,16 @@ describe('SecretConfigService', () => {
     expect(config.DB_PASS).toBe('pass');
     
     expect(ssmMock.getParameter).toHaveBeenCalledTimes(2);
+    expect(ssmMock.getParameter).toHaveBeenCalledWith('/ACO/BOCC/dbName');
+    expect(ssmMock.getParameter).toHaveBeenCalledWith('/ACO/BOCC/dbHost');
     expect(secretsMock.getSecret).toHaveBeenCalledWith('arn:secret:123');
   });
 
   it('should not fetch secrets again if already initialized (caching)', async () => {
     ssmMock.getParameter.mockResolvedValueOnce('db-name').mockResolvedValueOnce('db-host');
     secretsMock.getSecret.mockResolvedValueOnce({
-      DB_USER: 'user',
-      DB_PASS: 'pass',
+      acoDbUser: 'user',
+      acoDbPass: 'pass',
     });
 
     const instance = SecretConfigService.getInstance();

@@ -39,29 +39,36 @@ export class SecretConfigService {
     }
 
     // 1. Fetch Parameter Store: DB_NAME, DB_HOST
-    // These could be either the parameter names themselves or environment variables containing names.
-    // Based on user "DB_NAME", we will fetch parameters named "DB_NAME" and "DB_HOST" or fetch values using these keys as names.
-    const dbName = await this.ssmService.getParameter('DB_NAME');
-    const dbHost = await this.ssmService.getParameter('DB_HOST');
+    const dbNameParam = '/ACO/BOCC/dbName';
+    const dbHostParam = '/ACO/BOCC/dbHost';
+
+    const dbName = await this.ssmService.getParameter(dbNameParam);
+    const dbHost = await this.ssmService.getParameter(dbHostParam);
+
+    console.log('dbName from SSM: ', dbName);
+    console.log('dbHost from SSM: ', dbHost);
 
     // 2. Fetch Secret Manager: DB_USER, DB_PASS via ARN_SECRET
-    const dbSecrets = await this.secretsService.getSecret<{ DB_USER: string, DB_PASS: string }>(arnSecret);
+    const dbUserKey = 'acoDbUser';
+    const dbPassKey = 'acoDbPass';
 
-    if (!dbName || !dbHost || !dbSecrets || !dbSecrets.DB_USER || !dbSecrets.DB_PASS) {
+    const dbSecrets = await this.secretsService.getSecret<Record<string, string>>(arnSecret);
+
+    if (!dbName || !dbHost || !dbSecrets || !dbSecrets[dbUserKey] || !dbSecrets[dbPassKey]) {
       throw new Error('Could not fetch all required database secrets and parameters');
     }
 
     this.config = {
       DB_NAME: dbName,
       DB_HOST: dbHost,
-      DB_USER: dbSecrets.DB_USER,
-      DB_PASS: dbSecrets.DB_PASS,
+      DB_USER: dbSecrets[dbUserKey],
+      DB_PASS: dbSecrets[dbPassKey],
     };
 
     this.initialized = true;
   }
 
-  public get(key: 'DB_NAME' | 'DB_HOST' | 'DB_USER' | 'DB_PASS'): string {
+  public get(key: string): string {
     if (!this.initialized) {
       throw new Error('SecretConfigService has not been initialized. Call initialize() first.');
     }

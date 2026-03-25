@@ -12,7 +12,16 @@ if (fs.existsSync('node_modules')) {
 }
 
 // Instalamos sólo las de producción
-execSync('npm install --omit=dev', { stdio: 'inherit' });
+try {
+  execSync('npm install --omit=dev --legacy-peer-deps', { stdio: 'inherit' });
+} catch (error) {
+  console.error('\n❌ Error instalando las dependencias. Restaurando entorno...');
+  fs.rmSync('node_modules', { recursive: true, force: true });
+  if (fs.existsSync('node_modules_backup')) {
+    fs.renameSync('node_modules_backup', 'node_modules');
+  }
+  process.exit(1);
+}
 
 console.log('\n🗜️ 3. Comprimiendo el archivo para AWS...');
 const output = fs.createWriteStream('lambda-release.zip');

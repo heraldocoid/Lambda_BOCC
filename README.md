@@ -46,42 +46,35 @@ Recursos compartidos y utilidades:
 
 - **pg** (^8.20.0): Cliente de PostgreSQL para Node.js
 
-## 🚀 Inicio Rápido
+## 🚀 Comandos de Compilación y Empaquetado
 
-1. **Instalar dependencias**
-   ```bash
-   cd src
-   npm install
-   ```
+El proyecto está configurado para que puedas ejecutar todos los comandos desde la **carpeta raíz** del proyecto (gracias a los scripts en el `package.json`).
 
-2. **Configurar variables de entorno**
-   ```bash
-   cp .env.example .env
-   # Editar .env con tus valores
-   ```
+### 1. Instalar dependencias
+Para instalar las dependencias necesarias de desarrollo y producción:
+```bash
+npm install --prefix src
+```
+*(Nota: Esto instalará las dependencias de la carpeta `src`)*
 
-3. **Ejecutar la aplicación**
-   ```bash
-   npm start
-   ```
+### 2. Compilar el proyecto (Build)
+Para compilar el código TypeScript (`.ts`) a JavaScript (`.js`) en la carpeta `dist/`:
+```bash
+npm run build
+```
 
-## 📝 Notas de Desarrollo
+### 3. Empaquetar para AWS Lambda (Package)
+Para compilar, excluir las dependencias de desarrollo local y generar el archivo `.zip` listo para producción:
+```bash
+npm run package
+```
+Esto generará automáticamente un archivo llamado `lambda-release.zip` dentro de la carpeta `src/`.
 
-- El proyecto sigue una **arquitectura limpia** con separación de responsabilidades
-- Usa **CommonJS** como módulo (ver `package.json`)
-- Las conexiones a PostgreSQL están centralizadas en `infraestructure/db/pool.ts`
-- Los archivos `node_modules/` están ignorados en Git
+---
 
 ## ☁️ Cómo Subir a AWS Lambda
 
-Para desplegar este código compilado a tu consola de AWS Lambda manualmente, sigue estos pasos:
-
-1. **Empaquetar el Proyecto (Automático)**
-   Asegúrate de estar en la raíz de tu proyecto y ejecuta el siguiente script automático que preparará todo por ti:
-   ```bash
-   npm run package
-   ```
-   Esto compilará tu TypeScript de forma automática y creará un archivo `lambda-release.zip` dentro de la carpeta `src/` (dejando por fuera devDependencies).
+Para desplegar el archivo `lambda-release.zip` generado a tu consola de AWS Lambda de forma manual, sigue estos pasos:
 
 2. **Subir a la Consola de AWS**
    - Ingresa a la Consola de Amazon Web Services y busca **"Lambda"**.
