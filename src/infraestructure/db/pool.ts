@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import awsConfig from "../service/AwsConfigService.ts";
 
 /**
  * @Author: Leonardo S Ruiz Rodriguez
@@ -6,12 +7,24 @@ import { Pool } from "pg";
  * This class is reused between Lambda executions
  */
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: 5432,
-});
+let pool: Pool;
 
-export default pool;
+async function createPool():Promise<Pool> {
+  if(pool) return pool;
+
+  const secret = await awsConfig.getSecret(
+    process.env.DB_SECRET_ARN as string
+  );
+
+  pool = new Pool({
+    host: secret.host,
+    user: secret.username,
+    password: secret.password,
+    database: secret.dbname,
+    port: 5432,
+  });
+
+  return pool;
+}
+
+export default createPool;
